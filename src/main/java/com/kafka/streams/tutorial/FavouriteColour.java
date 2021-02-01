@@ -17,10 +17,8 @@ import java.util.stream.Stream;
 
 public class FavouriteColour {
 
-    private final String[] allowedColors =  new String[]{"green", "red", "blue"};
-    private final Stream<String> allowedColorsStream = Arrays.stream(allowedColors);
-
-    public void main(String[] args) {
+    public static void main(String[] args) {
+        String[] allowedColors =  new String[]{"green", "red", "blue"};
 
         Properties config = new Properties();
         config.put(StreamsConfig.APPLICATION_ID_CONFIG, "favourite-color-app");
@@ -31,23 +29,24 @@ public class FavouriteColour {
 
         StreamsBuilder builder = new StreamsBuilder();
         KStream<String, String> favouriteColor = builder.stream("favourite-color-input");
-        favouriteColor.filter((key, value) -> value.contains(","));
-        favouriteColor.selectKey((k, v) -> v.split(",")[0].toLowerCase(Locale.ROOT));
-        favouriteColor.mapValues(v -> v.split(",")[1].toLowerCase(Locale.ROOT));
-        favouriteColor.filter((k, v) -> allowedColorsStream.anyMatch(x -> x.equals(v)));
-        favouriteColor.to("favorite-color-cleaned", Produced.with(Serdes.String(), Serdes.String()));
+        favouriteColor.filter((key, value) -> value.contains(",")).
+                selectKey((k, v) -> v.split(",")[0].toLowerCase(Locale.ROOT)).
+                mapValues(v -> v.split(",")[1].toLowerCase(Locale.ROOT)).
+                filter((k, v) -> Arrays.asList(allowedColors).contains(v)).
+                to("favourite-color-cleaned", Produced.with(Serdes.String(), Serdes.String()));
 
         KTable<String, String> favouriteColorCleaned = builder.table("favourite-color-cleaned");
 
-        KTable<String, Long>favoriteColorsCount = favouriteColorCleaned.groupBy((k, v) -> new KeyValue<>(v, v)).count();
+        KTable<String, Long>favoriteColorsCount = favouriteColorCleaned.
+                groupBy((k, v) -> new KeyValue<>(v, v)).
+                count();
 
-        favoriteColorsCount.toStream().to("favorite-color-output", Produced.with(Serdes.String(), Serdes.Long()));;
+        favoriteColorsCount.toStream().to("favourite-color-output", Produced.with(Serdes.String(), Serdes.Long()));;
         KafkaStreams streams = new KafkaStreams(builder.build(), config);
+        streams.cleanUp();
         streams.start();
         System.out.println(streams.toString());
         Runtime.getRuntime().addShutdownHook(new Thread(streams::close));
-
-
 
     }
 
