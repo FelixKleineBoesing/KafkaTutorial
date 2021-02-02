@@ -1,5 +1,5 @@
 # create topic
-D:\kafka\bin\windows\kafka-topics.bat --create --zookeeper localhost:2181 --replication-factor 1 --partitions 1 --topic streams-plaintext-input
+D:\kafka\bin\windows\kafka-topics.bat --create --zookeeper localhost:2181 --replication-factor 1 --partitions 1 --topic word-count-input
 
 # start a producer
 D:\kafka\bin\windows\kafka-console-producer.bat --broker-list localhost:9092 --topic favourite-color-input
