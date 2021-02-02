@@ -6,11 +6,11 @@ D:\kafka\bin\windows\kafka-console-producer.bat --broker-list localhost:9092 --t
 
 # start a consumer
 D:\kafka\bin\windows\kafka-console-consumer.bat --bootstrap-server localhost:9092 ^
-    --topic favourite-color-output ^
+    --topic bank-balance-output ^
     --from-beginning ^
     --formatter kafka.tools.DefaultMessageFormatter ^
     --property print.key=true ^
     --property print.value=true ^
     --property key.deserializer=org.apache.kafka.common.serialization.StringDeserializer ^
-    --property value.deserializer=org.apache.kafka.common.serialization.LongDeserializer
+    --property value.deserializer=org.apache.kafka.common.serialization.StringDeserializer
 
